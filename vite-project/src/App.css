@@ -1,0 +1,35 @@
+#root {
+  width: 100%;
+  height: 100vh;
+  text-align: center;
+}
+
+.main-container {
+  background-color: aqua;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  padding: 2em;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 10vh;
+}
+
+.canvasContainer {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100vw;
+  height: 90vh;
+}
+
+.read-the-docs {
+  color: #888;
+}
