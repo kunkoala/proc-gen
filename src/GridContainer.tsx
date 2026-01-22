@@ -36,9 +36,10 @@ const GridContainer = () => {
   // you may want the origin to be the top left corner of a hex's bounding box
   // instead of its center (which is the default)
   const [clickedHex, setClickedHex] = useState<AxialCoordinates | null>(null);
+  const [hoveredHex, setHoveredHex] = useState<AxialCoordinates | null>(null);
 
   const Hex = useMemo(
-    () => defineHex({ dimensions: 80, origin: "topLeft" }),
+    () => defineHex({ dimensions: 70, origin: "topLeft" }),
     []
   );
 
@@ -73,16 +74,25 @@ const GridContainer = () => {
   const drawSelection = useCallback(
     (g: Graphics) => {
       g.clear();
-      if (!clickedHex) return;
 
-      const hex = grid.getHex(clickedHex);
-      if (!hex) return;
+      if (clickedHex) {
+        const hex = grid.getHex(clickedHex);
+        if (!hex) return;
+        g.poly(hex.corners)
+          .fill(0x00ff00, 0.55)
+          .stroke({ width: 2, color: 0x006600, alpha: 1 });
+      }
 
-      g.poly(hex.corners)
-        .fill(0x00ff00, 0.55)
-        .stroke({ width: 2, color: 0x006600, alpha: 1 });
+      // highlight hovered hex
+      if (hoveredHex) {
+        const hex = grid.getHex(hoveredHex);
+        if (!hex) return;
+        g.poly(hex.corners)
+          .fill(0xffff00, 0.35)
+          .stroke({ width: 2, color: 0x666600, alpha: 1 });
+      }
     },
-    [grid, clickedHex]
+    [grid, clickedHex, hoveredHex]
   );
 
   const onClick = useCallback(
@@ -94,11 +104,29 @@ const GridContainer = () => {
     [grid]
   );
 
+  const onHover = useCallback(
+    (event: FederatedPointerEvent) => {
+      const coords = event.getLocalPosition(event.currentTarget);
+      const gridCoords = grid.pointToHex(coords);
+
+      console.log("Hovered Hex:", gridCoords);
+      setHoveredHex(gridCoords);
+    },
+    [grid]
+  );
+
   return (
-    <Application width={1000} height={1000}>
-      <pixiGraphics draw={draw} eventMode="static" onClick={onClick} />
-      <pixiGraphics draw={drawSelection} />
-    </Application>
+    <div>
+      <Application width={1000} height={600}>
+        <pixiGraphics
+          draw={draw}
+          eventMode="static"
+          onClick={onClick}
+          onPointerMove={onHover}
+        />
+        <pixiGraphics draw={drawSelection} />
+      </Application>
+    </div>
   );
 };
 
